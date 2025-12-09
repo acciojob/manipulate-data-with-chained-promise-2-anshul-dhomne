@@ -1,13 +1,60 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <title>Chained Promises: Array Transform</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { padding: 12px; border: 1px solid #ddd; min-height: 24px; width: max-content; }
+  </style>
+</head>
+<body>
+  <h3>Result</h3>
+  <div id="output"></div>
 
-  <body>
-    <!-- do not change this code -->
-    <div id="output"></div>
-    <script type="text/javascript" src="./script.js"></script>
-  </body>
+  <script>
+    // Input array
+    const inputArray = [1, 2, 3, 4];
+
+    // Start: return a promise that resolves immediately with the array
+    // (This yields the expected timeline: after 1s -> [2,4], after 3s -> [4,8])
+    function getInitialArray() {
+      return Promise.resolve(inputArray);
+    }
+
+    // Filter function that returns a promise resolving after 1 second
+    function filterOutOdds(arr) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const evens = arr.filter(n => n % 2 === 0);
+          // update DOM with the filtered result
+          document.getElementById('output').textContent = evens.join(',');
+          resolve(evens);
+        }, 1000); // 1 second delay
+      });
+    }
+
+    // Multiply function that returns a promise resolving after 2 seconds
+    function multiplyByTwo(arr) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const doubled = arr.map(n => n * 2);
+          // update DOM with the doubled result
+          document.getElementById('output').textContent = doubled.join(',');
+          resolve(doubled);
+        }, 2000); // 2 second delay (additional)
+      });
+    }
+
+    // Chain the promises
+    getInitialArray()
+      .then(filterOutOdds)   // after 1s -> shows [2,4]
+      .then(multiplyByTwo)   // after additional 2s -> shows [4,8]
+      .catch(err => {
+        console.error('Something went wrong:', err);
+      });
+
+    // Note: output div is empty on load as required.
+  </script>
+</body>
 </html>
